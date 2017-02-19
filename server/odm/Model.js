@@ -1,4 +1,6 @@
 var Cursor = require('./Cursor')
+var tv4 = require('tv4')
+var Promise = require('bluebird')
 class Model {
   constructor (name, schema, dbPromise) {
     this.__collection = null
@@ -10,6 +12,9 @@ class Model {
     })
   }
 
+  validate (doc) {
+    return tv4.validate(doc, this.schema)
+  }
   giveCursorBack (method, args) {
     return new Cursor(this.__collectionPromise, method, args)
   }
@@ -29,6 +34,10 @@ class Model {
     })
   }
   insert () {
+    if (!this.validate(arguments[0])) {
+      var error = Error('Invalid Document')
+      return Promise.reject(error)
+    }
     var args = arguments
     return this.__collectionPromise.then(function (collection) {
       return collection.insert.apply(collection, args)
