@@ -11,7 +11,7 @@ class Cursor {
     var valueToReturn
     if (this.__wrappedCursor === null) {
       valueToReturn = this.__cursorPromise.then(cursor => {
-        cursor[methodName].apply(cursor, args)
+        return cursor[methodName].apply(cursor, args)
       })
     } else {
       valueToReturn = this.__wrappedCursor[methodName].apply(this.__wrappedCursor, args)

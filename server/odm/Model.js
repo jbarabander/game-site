@@ -16,11 +16,11 @@ class Model {
 
   find () {
     var args = arguments
-    return this.giveCursorBack(method, args)
+    return this.giveCursorBack('find', args)
   }
   findOne () {
     var args = arguments
-    return this.giveCursorBack(method, args)
+    return this.giveCursorBack('findOne', args)
   }
   update () {
     var args = arguments
