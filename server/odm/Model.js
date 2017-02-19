@@ -10,19 +10,28 @@ class Model {
     })
   }
 
-  giveCursorBack (method, arguments) {
-    return new Cursor(this.__collectionPromise, method, arguments)
+  giveCursorBack (method, args) {
+    return new Cursor(this.__collectionPromise, method, args)
   }
 
   find () {
-    return this.giveCursorBack(method, arguments)
+    var args = arguments
+    return this.giveCursorBack(method, args)
   }
   findOne () {
-    return this.giveCursorBack(method, arguments)
+    var args = arguments
+    return this.giveCursorBack(method, args)
   }
   update () {
+    var args = arguments
     return this.__collectionPromise.then(function (collection) {
-      return collection.update(arguments)
+      return collection.update.apply(collection, args)
+    })
+  }
+  insert () {
+    var args = arguments
+    return this.__collectionPromise.then(function (collection) {
+      return collection.insert.apply(collection, args)
     })
   }
 }

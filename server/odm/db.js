@@ -20,7 +20,7 @@ class Db {
     if (!schema) {
       return this.models[name]
     }
-    this.models[name] = new Model(name, schema, this.__connectionPromises)
+    this.models[name] = new Model(name, schema, this.__connectionPromise)
   }
 }
 
