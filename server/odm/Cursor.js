@@ -22,13 +22,6 @@ class Cursor {
       return valueToReturn
     }
   }
-  // __applyPrefetchStack () {
-  //   while(this.__prefetchStack.length) {
-  //     var currentOp = this.__prefetchStack.shift()
-  //     this.__applyToCursor(currentOp.method, currentOp.arguments)
-  //   }
-  //   this.__prefetchSt
-  // }
   sort () {
     return this.__applyToCursor('sort', arguments, true)
   }

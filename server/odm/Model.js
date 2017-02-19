@@ -34,7 +34,8 @@ class Model {
     })
   }
   insert () {
-    if (!this.validate(arguments[0])) {
+    var isValid = this.validate(arguments[0])
+    if (!isValid) {
       var error = Error('Invalid Document')
       return Promise.reject(error)
     }
