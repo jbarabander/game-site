@@ -17,10 +17,10 @@ class Db {
     })
   }
   model (name, schema) {
-    if (!schema) {
-      return this.models[name]
+    if (schema) {
+      this.models[name] = new Model(name, schema, this.__connectionPromise)
     }
-    this.models[name] = new Model(name, schema, this.__connectionPromise)
+    return this.models[name]
   }
 }
 

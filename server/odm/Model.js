@@ -25,7 +25,9 @@ class Model {
   }
   findOne () {
     var args = arguments
-    return this.giveCursorBack('findOne', args)
+    return this.__collectionPromise.then(function (collection) {
+      return collection.findOne.apply(collection, args)
+    })
   }
   update () {
     var args = arguments
@@ -42,6 +44,17 @@ class Model {
     var args = arguments
     return this.__collectionPromise.then(function (collection) {
       return collection.insert.apply(collection, args)
+    })
+  }
+  createIndex (keys, options) {
+    if (!options) {
+      options = {}
+    }
+    if (!options.background) {
+      options.background = true
+    }
+    return this.__collectionPromise.then(function (collection) {
+      return collection.createIndex(keys, options)
     })
   }
 }
