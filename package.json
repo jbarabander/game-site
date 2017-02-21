@@ -223,6 +223,7 @@
     "fontfaceobserver": "2.0.7",
     "graphql": "^0.9.1",
     "graphql-tag": "^1.2.4",
+    "graphql-tools": "^0.10.0",
     "immutable": "3.8.1",
     "intl": "1.2.5",
     "invariant": "2.2.2",

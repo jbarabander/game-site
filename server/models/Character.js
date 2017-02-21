@@ -28,7 +28,7 @@ var characterSchema = {
 					spell: {type: 'string'}
 				}
 			}
-		}
+		},
 		imageUrl: {type: 'string'},
 		characterDescription: {type: 'string'}
 	},
