@@ -54,6 +54,9 @@ class Cursor {
     }
     return destStream
   }
+  on () {
+    return this.__applyToCursor('on', arguments, true)
+  }
 }
 
 module.exports = Cursor
