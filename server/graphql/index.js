@@ -9,6 +9,7 @@ const RootQuery = `
 		weapons: [Weapon]
 		weapon(id: ID): Weapon
 		characters: [Character]
+		character: Character
 	}
 `
 
@@ -24,11 +25,13 @@ const rootResolver = {
 			if (!id) {
 				throw Error('No ID specified')
 			}
-			return Weapon
-			.findOne({_id: ObjectId(id)})
-			.then(function (el) {
-				return el
-			})
+			return Weapon.findOne({_id: ObjectId(id)})
+		},
+		character (_, { id }) {
+			if (!id) {
+				throw Error('No ID specified')
+			}
+			return Character.findOne({_id: ObjectId(id)})
 		}
 	}
 }
