@@ -2,10 +2,12 @@ const WeaponSchema = require('./schemas/Weapon')
 const CharacterSchema = require('./schemas/Character')
 const Weapon = require('../models/Weapon')
 const Character = require('../models/Character')
+const ObjectId = require('mongodb').ObjectId
 const makeExecutableSchema = require('graphql-tools').makeExecutableSchema
 const RootQuery = `
 	type RootQuery {
 		weapons: [Weapon]
+		weapon(id: ID): Weapon
 		characters: [Character]
 	}
 `
@@ -17,6 +19,16 @@ const rootResolver = {
 		},
 		characters () {
 			return Character.find().toArray()
+		},
+		weapon (_, { id }) {
+			if (!id) {
+				throw Error('No ID specified')
+			}
+			return Weapon
+			.findOne({_id: ObjectId(id)})
+			.then(function (el) {
+				return el
+			})
 		}
 	}
 }
