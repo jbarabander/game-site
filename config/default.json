@@ -1,0 +1,6 @@
+{
+    "settings": {
+        "db": "mongodb://localhost/game",
+        "port": "3000"
+    }
+}
