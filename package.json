@@ -224,6 +224,7 @@
     "graphql": "^0.9.1",
     "graphql-tag": "^1.2.4",
     "graphql-tools": "^0.10.0",
+    "history": "^4.5.1",
     "immutable": "3.8.1",
     "intl": "1.2.5",
     "invariant": "2.2.2",
@@ -250,6 +251,7 @@
     "reselect": "2.5.4",
     "sanitize.css": "4.1.0",
     "styled-components": "1.1.2",
+    "tiny-mongo": "0.0.3",
     "tv4": "^1.2.7",
     "warning": "3.0.0",
     "whatwg-fetch": "2.0.1"
