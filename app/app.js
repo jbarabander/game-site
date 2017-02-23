@@ -14,8 +14,8 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { applyRouterMiddleware, Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
-import { useScroll } from 'react-router-scroll';
 import 'sanitize.css/sanitize.css';
+import routes from 'routes';
 
 // Import root app
 import App from 'containers/App';
@@ -59,10 +59,6 @@ const history = syncHistoryWithStore(browserHistory, store, {
 });
 
 // Set up the router, wrapping all Routes in the App component
-const rootRoute = {
-  component: App,
-  childRoutes: createRoutes(store),
-};
 
 const render = (messages) => {
   ReactDOM.render(
@@ -70,12 +66,7 @@ const render = (messages) => {
       <LanguageProvider messages={messages}>
         <Router
           history={history}
-          routes={rootRoute}
-          render={
-            // Scroll to top when going to a new page, imitating default browser
-            // behaviour
-            applyRouterMiddleware(useScroll())
-          }
+          routes={routes}
         />
       </LanguageProvider>
     </Provider>,
