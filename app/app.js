@@ -42,7 +42,7 @@ import { translationMessages } from './i18n';
 import './global-styles';
 
 // Import routes
-import createRoutes from './routes';
+import routes from './routes';
 
 // Observe loading of Open Sans (to remove open sans, remove the <link> tag in
 // the index.html file and this observer)
@@ -70,10 +70,6 @@ const history = syncHistoryWithStore(browserHistory, store, {
 });
 
 // Set up the router, wrapping all Routes in the App component
-const rootRoute = {
-  component: App,
-  childRoutes: createRoutes(store),
-};
 
 const render = (messages) => {
   ReactDOM.render(
@@ -81,7 +77,7 @@ const render = (messages) => {
       <LanguageProvider messages={messages}>
         <Router
           history={history}
-          routes={rootRoute}
+          routes={routes}
         />
       </LanguageProvider>
     </Provider>,
