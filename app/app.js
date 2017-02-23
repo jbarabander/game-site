@@ -14,7 +14,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { applyRouterMiddleware, Router, browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
-import FontFaceObserver from 'fontfaceobserver';
+import { useScroll } from 'react-router-scroll';
 import 'sanitize.css/sanitize.css';
 
 // Import root app
@@ -27,11 +27,11 @@ import { makeSelectLocationState } from 'containers/App/selectors';
 import LanguageProvider from 'containers/LanguageProvider';
 
 // Load the favicon, the manifest.json file and the .htaccess file
-/* eslint-disable import/no-webpack-loader-syntax */
+/* eslint-disable import/no-unresolved, import/extensions */
 import '!file-loader?name=[name].[ext]!./favicon.ico';
 import '!file-loader?name=[name].[ext]!./manifest.json';
-import 'file-loader?name=[name].[ext]!./.htaccess'; // eslint-disable-line import/extensions
-/* eslint-enable import/no-webpack-loader-syntax */
+import 'file-loader?name=[name].[ext]!./.htaccess';
+/* eslint-enable import/no-unresolved, import/extensions */
 
 import configureStore from './store';
 
@@ -41,19 +41,8 @@ import { translationMessages } from './i18n';
 // Import CSS reset and Global Styles
 import './global-styles';
 
-// Import routes
-import routes from './routes';
-
-// Observe loading of Open Sans (to remove open sans, remove the <link> tag in
-// the index.html file and this observer)
-const openSansObserver = new FontFaceObserver('Open Sans', {});
-
-// When Open Sans is loaded, add a font-family using Open Sans to the body
-openSansObserver.load().then(() => {
-  document.body.classList.add('fontLoaded');
-}, () => {
-  document.body.classList.remove('fontLoaded');
-});
+// Import root routes
+import createRoutes from './routes';
 
 // Create redux store with history
 // this uses the singleton browserHistory provided by react-router
@@ -70,6 +59,10 @@ const history = syncHistoryWithStore(browserHistory, store, {
 });
 
 // Set up the router, wrapping all Routes in the App component
+const rootRoute = {
+  component: App,
+  childRoutes: createRoutes(store),
+};
 
 const render = (messages) => {
   ReactDOM.render(
@@ -77,7 +70,12 @@ const render = (messages) => {
       <LanguageProvider messages={messages}>
         <Router
           history={history}
-          routes={routes}
+          routes={rootRoute}
+          render={
+            // Scroll to top when going to a new page, imitating default browser
+            // behaviour
+            applyRouterMiddleware(useScroll())
+          }
         />
       </LanguageProvider>
     </Provider>,
@@ -101,7 +99,6 @@ if (!window.Intl) {
   }))
     .then(() => Promise.all([
       import('intl/locale-data/jsonp/en.js'),
-      import('intl/locale-data/jsonp/de.js'),
     ]))
     .then(() => render(translationMessages))
     .catch((err) => {
