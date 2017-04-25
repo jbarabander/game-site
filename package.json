@@ -252,7 +252,7 @@
     "reselect": "2.5.4",
     "sanitize.css": "4.1.0",
     "styled-components": "1.1.2",
-    "tiny-mongo": "0.0.3",
+    "tiny-mongo": "0.0.6",
     "tv4": "^1.2.7",
     "warning": "3.0.0",
     "whatwg-fetch": "2.0.1"
