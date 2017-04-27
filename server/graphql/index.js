@@ -1,10 +1,15 @@
+const ObjectId = require('mongodb').ObjectId;
+const get = require('lodash').get;
+const Promise = require('bluebird');
+// graphql schemas
 const WeaponSchema = require('./schemas/Weapon');
 const CharacterSchema = require('./schemas/Character');
 const EventSchema = require('./schemas/Event');
+
+// database models
 const Weapon = require('../models/Weapon');
 const Character = require('../models/Character');
 const Event = require('../models/Event');
-const ObjectId = require('mongodb').ObjectId;
 const makeExecutableSchema = require('graphql-tools').makeExecutableSchema;
 const RootQuery = `
     type RootQuery {
@@ -12,10 +17,35 @@ const RootQuery = `
         weapon(id: ID): Weapon
         characters: [Character]
         character: Character
-        events(limit: Int): [Event]
-        event(id: ID): Event
+        events(limit: Int, expandPrior: Boolean): [Event]
+        event(id: ID, expandPrior: Boolean): Event
     }
 `;
+
+function retrieveFromParentEvents(eventHash, priorEventsToFind) {
+  const reducedPriorEventsToFind = [];
+  const priorInCurrentEvents = {};
+  priorEventsToFind.forEach((key) => {
+    const stringKey = key.toString();
+    if (eventHash[stringKey]) {
+      priorInCurrentEvents[stringKey] = eventHash[stringKey];
+    } else {
+      reducedPriorEventsToFind.push(key);
+    }
+  });
+  if (!reducedPriorEventsToFind.length) {
+    return Promise.resolve(priorInCurrentEvents);
+  }
+  return Event.find({ $in: reducedPriorEventsToFind }).then((events) => {
+    const priorEventsFromDb = events.reduce((prev, curr) => {
+      if (curr._id) {
+        prev[curr._id.toString()] = curr;
+      }
+      return prev;
+    }, {});
+    return Object.assign(priorInCurrentEvents, priorEventsFromDb);
+  });
+}
 
 const rootResolver = {
   RootQuery: {
@@ -25,17 +55,36 @@ const rootResolver = {
     characters() {
       return Character.find().toArray();
     },
-    events(_, { limit }) {
-      const eventQuery = Event.find();
+    events(_, { limit, expandPrior }, context) {
+      const opts = {};
       if (limit) {
-        eventQuery.limit(limit);
+        opts.limit = limit;
       }
-      return eventQuery.toArray();
+      return Event.find({}, opts).toArray().then((events) => {
+        if (expandPrior) {
+          // eslint-disable-next-line
+          context.events = {};
+          // eslint-disable-next-line
+          context.priorEvents = [];
+          events.forEach((event) => {
+            if (event.priorEvent) {
+              context.priorEvents.push(event.priorEvent);
+            }
+            if (event._id) {
+              context.events[event._id.toString()] = event;
+            }
+          });
+        }
+        return events;
+      });
     },
-    event(_, { id }) {
+    event(_, { id, expandPrior }, context) {
+      const boolExpandPrior = !!expandPrior;
       if (!id) {
         throw Error('No ID specified');
       }
+      // eslint-disable-next-line
+      context.expandPrior = boolExpandPrior;
       return Event.findOne({ _id: ObjectId(id) });
     },
     weapon(_, { id }) {
@@ -52,11 +101,19 @@ const rootResolver = {
     },
   },
   Event: {
-    priorEvent({ priorEvent }, args, context, info) {
-      console.log(info);
-      console.log(info.path.prev.prev.key);
+    priorEvent({ priorEvent }, args, context) {
       if (priorEvent) {
-        return Event.findOne(priorEvent);
+        if (context.events && Array.isArray(context.priorEvents)) {
+          if (!context.priorEventsPromise) {
+            context.priorEventsPromise = retrieveFromParentEvents(context.events, context.priorEvents);
+          }
+          return context
+          .priorEventsPromise
+          .then((priorEventsHash) => (priorEventsHash[priorEvent.toString()]));
+        }
+        if (context.expandPrior) {
+          return Event.findOne({ _id: priorEvent });
+        }
       }
       return null;
     },
