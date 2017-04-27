@@ -1,5 +1,4 @@
 const ObjectId = require('mongodb').ObjectId;
-const get = require('lodash').get;
 const Promise = require('bluebird');
 // graphql schemas
 const WeaponSchema = require('./schemas/Weapon');
@@ -71,6 +70,7 @@ const rootResolver = {
               context.priorEvents.push(event.priorEvent);
             }
             if (event._id) {
+              // eslint-disable-next-line
               context.events[event._id.toString()] = event;
             }
           });

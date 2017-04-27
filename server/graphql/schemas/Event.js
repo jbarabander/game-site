@@ -12,9 +12,6 @@ const Event = `
         eventDescription: String
         priorEvent: Event
     }
-    type Events {
-        events: [Event]
-    }
 `;
 
 module.exports = Event;
