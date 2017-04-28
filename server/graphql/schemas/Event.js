@@ -11,6 +11,7 @@ const Event = `
         eventType: EventType!
         eventDescription: String
         priorEvent: Event
+        characters: [Character]
     }
 `;
 

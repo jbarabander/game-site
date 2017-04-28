@@ -14,6 +14,12 @@ const eventSchema = {
     },
     eventDescription: { type: 'string' },
     priorEvent: { $ref: 'objectId' },
+    characters: {
+      type: 'array',
+      items: {
+        $ref: 'objectId',
+      },
+    },
   },
   required: ['name', 'eventType', 'eventDescription'],
 };
