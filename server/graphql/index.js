@@ -12,6 +12,7 @@ const graphqlUtils = require('../utils/graphql');
 const addToContext = graphqlUtils.addToContext;
 const generateMongoHash = graphqlUtils.generateMongoHash;
 const gatherSelections = graphqlUtils.gatherSelections;
+const generateMongoProjection = graphqlUtils.generateMongoProjection;
 
 // database models
 const Weapon = require('../models/Weapon');
@@ -93,10 +94,7 @@ const rootResolver = {
       });
     },
     event(_, { id, expandPrior }, context, info) {
-      const fields = gatherSelections(info).reduce((prev, curr) => {
-        prev[curr] = 1;
-        return prev;
-      }, {});
+      const fields = generateMongoProjection(info);
       const boolExpandPrior = !!expandPrior;
       if (!id) {
         throw Error('No ID specified');
@@ -136,7 +134,9 @@ const rootResolver = {
       }
       return null;
     },
-    characters({ characters }, args, context) {
+    characters({ characters }, args, context, info) {
+      const fields = generateMongoProjection(info);
+      console.log(fields);
       if (!Array.isArray(characters)) {
         return null;
       }
@@ -147,7 +147,7 @@ const rootResolver = {
         return context.eventCharactersPromise
         .then((charactersHash) => characters.map((id) => charactersHash[id.toString()]));
       }
-      return Character.find({ _id: { $in: characters } }).toArray();
+      return Character.find({ _id: { $in: characters } }, { fields }).toArray();
     },
   },
 };

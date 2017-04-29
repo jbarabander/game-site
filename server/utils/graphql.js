@@ -23,6 +23,15 @@ function gatherSelections(info) {
   return info.fieldNodes[0].selectionSet.selections.map((selection) => selection.name.value);
 }
 
+function generateMongoProjection(info) {
+  return gatherSelections(info).reduce((prev, curr) => {
+    if (typeof curr === 'string') {
+      prev[curr] = 1;
+    }
+    return prev;
+  }, {});
+}
+
 function generateMongoHash(results) {
   if (!Array.isArray(results)) {
     return {};
@@ -39,4 +48,5 @@ module.exports = {
   addToContext,
   generateMongoHash,
   gatherSelections,
+  generateMongoProjection,
 };
