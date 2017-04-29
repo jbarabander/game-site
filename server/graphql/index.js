@@ -1,5 +1,7 @@
 const ObjectId = require('mongodb').ObjectId;
 const Promise = require('bluebird');
+const makeExecutableSchema = require('graphql-tools').makeExecutableSchema;
+
 // graphql schemas
 const WeaponSchema = require('./schemas/Weapon');
 const CharacterSchema = require('./schemas/Character');
@@ -9,12 +11,12 @@ const EventSchema = require('./schemas/Event');
 const graphqlUtils = require('../utils/graphql');
 const addToContext = graphqlUtils.addToContext;
 const generateMongoHash = graphqlUtils.generateMongoHash;
+const gatherSelections = graphqlUtils.gatherSelections;
 
 // database models
 const Weapon = require('../models/Weapon');
 const Character = require('../models/Character');
 const Event = require('../models/Event');
-const makeExecutableSchema = require('graphql-tools').makeExecutableSchema;
 const RootQuery = `
     type RootQuery {
         weapons: [Weapon]
@@ -90,14 +92,19 @@ const rootResolver = {
         return events;
       });
     },
-    event(_, { id, expandPrior }, context) {
+    event(_, { id, expandPrior }, context, info) {
+      const fields = gatherSelections(info).reduce((prev, curr) => {
+        prev[curr] = 1;
+        return prev;
+      }, {});
       const boolExpandPrior = !!expandPrior;
       if (!id) {
         throw Error('No ID specified');
       }
       // eslint-disable-next-line
       context.expandPrior = boolExpandPrior;
-      return Event.findOne({ _id: ObjectId(id) });
+      return Event
+      .findOne({ _id: ObjectId(id) }, { fields });
     },
     weapon(_, { id }) {
       if (!id) {
@@ -113,7 +120,7 @@ const rootResolver = {
     },
   },
   Event: {
-    priorEvent({ priorEvent }, args, context) {
+    priorEvent({ priorEvent }, args, context, info) {
       if (priorEvent) {
         if (context.events && Array.isArray(context.priorEvents)) {
           if (!context.priorEventsPromise) {

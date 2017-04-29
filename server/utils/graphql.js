@@ -19,6 +19,10 @@ function addToContext(results, context, info) {
   return recursiveAddToContext(info.path, results);
 }
 
+function gatherSelections(info) {
+  return info.fieldNodes[0].selectionSet.selections.map((selection) => selection.name.value);
+}
+
 function generateMongoHash(results) {
   if (!Array.isArray(results)) {
     return {};
@@ -34,4 +38,5 @@ function generateMongoHash(results) {
 module.exports = {
   addToContext,
   generateMongoHash,
+  gatherSelections,
 };
