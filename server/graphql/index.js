@@ -136,7 +136,6 @@ const rootResolver = {
     },
     characters({ characters }, args, context, info) {
       const fields = generateMongoProjection(info);
-      console.log(fields);
       if (!Array.isArray(characters)) {
         return null;
       }
